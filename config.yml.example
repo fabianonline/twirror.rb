@@ -12,4 +12,5 @@ twitter:
     user:
         token: INSERT_USER_TOKEN_HERE
         secret: INSERT_USER_SECRET_HERE
+    username: YOUR_TWITTER_NICK
 

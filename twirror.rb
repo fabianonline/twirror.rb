@@ -61,7 +61,7 @@ class Tweet < ActiveRecord::Base
             when :monthly then 2.years.ago
             else raise "Unknown period"
         end
-        tweets = Tweet.find(:all, :conditions=>{:date=>start..Time.now, :sender_name=>'fabianonline'})
+        tweets = Tweet.find(:all, :conditions=>{:date=>start..Time.now, :sender_name=>config['twitter']['username']})
         result = tweets.inject(Hash.new(0)) do |memo, tweet|
             diff = case period
                 when :daily then 0
@@ -164,7 +164,7 @@ elsif opt["info"]
 elsif opt["nelsontweets"]
     Tweet.nelsontweets
 elsif opt["create-locations-file"]
-    tweets = Tweet.find(:all, :conditions=>"sender_name='fabianonline' && geo_lat is not null && geo_long is not null", :order=>"date DESC", :limit=>500)
+    tweets = Tweet.find(:all, :conditions=>"sender_name='#{config['twitter']['username']}' && geo_lat is not null && geo_long is not null", :order=>"date DESC", :limit=>500)
     puts "pts=[" + tweets.map{|t| "(#{t.geo_long}, #{t.geo_lat})"}.join(",\n") + "]"
 elsif opt["create-kml"]
     puts '<?xml version="1.0" encoding="UTF-8"?>'
@@ -175,7 +175,7 @@ elsif opt["create-kml"]
     puts '<Style id="a">  <PolyStyle><color>88ff0000</color></PolyStyle></Style>'
     #puts '<Style id="smallPolyStyle"><PolyStyle><color>88ff0000</color></PolyStyle></Style>'
     decimals=2
-    tweets = Tweet.find(:all, :conditions=>"sender_name='fabianonline' && geo_lat is not null && geo_long is not null", :order=>"date DESC", :select=>"*, CONCAT(ROUND(geo_lat, #{decimals}), ', ', ROUND(geo_long, #{decimals})) as geo", :group=>"geo")
+    tweets = Tweet.find(:all, :conditions=>"sender_name='#{config['twitter']['username']}' && geo_lat is not null && geo_long is not null", :order=>"date DESC", :select=>"*, CONCAT(ROUND(geo_lat, #{decimals}), ', ', ROUND(geo_long, #{decimals})) as geo", :group=>"geo")
     tweets.each do |t|
         long = t.geo_lat.round(decimals)
         lat = t.geo_long.round(decimals)
@@ -186,7 +186,7 @@ elsif opt["create-kml"]
         #puts "<Placemark><name>#{t.id}</name><Point><coordinates>#{coords}</coordinates></Point></Placemark>"
     end
     decimals=3
-    weets = Tweet.find(:all, :conditions=>"sender_name='fabianonline' && geo_lat is not null && geo_long is not null", :order=>"date DESC", :select=>"*, CONCAT(ROUND(geo_lat, #{decimals}), ', ', ROUND(geo_long, #{decimals})) as geo", :group=>"geo")
+    tweets = Tweet.find(:all, :conditions=>"sender_name='#{config['twitter']['username']}' && geo_lat is not null && geo_long is not null", :order=>"date DESC", :select=>"*, CONCAT(ROUND(geo_lat, #{decimals}), ', ', ROUND(geo_long, #{decimals})) as geo", :group=>"geo")
     tweets.each do |t|
         long = t.geo_lat.round(decimals)
         lat = t.geo_long.round(decimals)
