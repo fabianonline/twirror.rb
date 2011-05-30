@@ -1,0 +1,15 @@
+mysql:
+    host: localhost
+    username: user
+    password: pass
+    database: twirror
+    encoding: UTF8
+
+twitter:
+    consumer:
+        token: INSERT_CONSUMER_TOKEN_HERE
+        secret: INSERT_CONSUMER_SECRET_HERE
+    user:
+        token: INSERT_USER_TOKEN_HERE
+        secret: INSERT_USER_SECRET_HERE
+
