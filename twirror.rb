@@ -117,8 +117,9 @@ opt = Getopt::Long.getopts(
     ['--create-locations-file', BOOLEAN],
     ['--create-kml', BOOLEAN],
     ['--nagios', BOOLEAN],
-    ['--nelsontweets', BOOLEAN]
-);
+    ['--nelsontweets', BOOLEAN],
+    ['--bitmap', BOOLEAN]
+) rescue {}
 
 
 if opt["update"]
@@ -196,6 +197,32 @@ elsif opt["create-kml"]
         puts "<Placemark><name>#{t.id}</name><styleUrl>#a</styleUrl><Polygon><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>#{coords}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>"
     end
     puts "</Folder></Document></kml>"
+elsif opt["bitmap"]
+    require 'RMagick'
+    PER_HOUR = 20
+    canvas = Magick::Image.new(356*2, 24*PER_HOUR)
+    gc = Magick::Draw.new
+    gc.stroke('lightcyan2')
+    (1..23).each do |h|
+        gc.line(0, h*PER_HOUR, 100000, h*PER_HOUR)
+    end
+    gc.stroke('blue')
+    [6,12,18].each do |h|
+        gc.line(0, h*PER_HOUR, 100000, h*PER_HOUR)
+    end
+
+    gc.stroke('black')
+    gc.fill('black')
+    start = (356*2).days.ago
+    tweets = Tweet.find(:all, :conditions=>{:date=>start..Time.now, :sender_name=>'fabianonline'})
+    for tweet in tweets do
+        x = tweet.date.to_date - start.to_date
+        y = (tweet.date.hour*60 + tweet.date.min)*PER_HOUR/60
+        gc.rectangle(x-1, y-1, x+1, y+1)
+        #gc.point(x, y)
+    end
+    gc.draw(canvas)
+    canvas.write("bitmap.png")
 end
 
 
