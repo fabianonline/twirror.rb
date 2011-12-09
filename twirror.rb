@@ -53,7 +53,7 @@ class Tweet < ActiveRecord::Base
         t.save
     end
 
-    def self.stats(period)
+    def self.stats(period, username)
         start = case period
             when :hourly then 1.days.ago
             when :daily then 30.days.ago
@@ -61,7 +61,7 @@ class Tweet < ActiveRecord::Base
             when :monthly then 2.years.ago
             else raise "Unknown period"
         end
-        tweets = Tweet.find(:all, :conditions=>{:date=>start..Time.now, :sender_name=>config['twitter']['username']})
+        tweets = Tweet.find(:all, :conditions=>{:date=>start..Time.now, :sender_name=>username})
         result = tweets.inject(Hash.new(0)) do |memo, tweet|
             diff = case period
                 when :daily then 0
@@ -150,13 +150,13 @@ unless conditions.empty?
 end
 
 if opt["hourly"]
-    Tweet.stats(:hourly)
+    Tweet.stats(:hourly, config['twitter']['username'])
 elsif opt["daily"]
-    Tweet.stats(:daily)
+    Tweet.stats(:daily, config['twitter']['username'])
 elsif opt["weekly"]
-    Tweet.stats(:weekly)
+    Tweet.stats(:weekly, config['twitter']['username'])
 elsif opt["monthly"]
-    Tweet.stats(:monthly)
+    Tweet.stats(:monthly, config['twitter']['username'])
 elsif opt["help"]
     puts "help"
 elsif opt["info"]
