@@ -1,0 +1,3 @@
+PassengerEnabled on
+PassengerAppRoot /var/www/twirror
+RackBaseURI /twirror
