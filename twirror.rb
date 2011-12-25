@@ -89,6 +89,13 @@ class Tweet < ActiveRecord::Base
         puts "Neuester Tweet: #{Tweet.last.date} (vor #{(Time.now - Tweet.last.date) / 60} Minuten)"
     end
 
+    def self.get_user_id(username)
+        result = Tweet.find_all_by_sender_name(username, :group=>:sender_id)
+        raise "Ambiguous Username... Houston, we have a problem!" if result.count > 1
+        raise "User not found" if result.empty?
+        result.first.sender_id
+    end
+
     def self.nelsontweets
         ende = Date.today-Date.today.wday
         start = ende-7

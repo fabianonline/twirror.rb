@@ -1,0 +1,9 @@
+<ol>
+<% @tweets.each do |tweet| %>
+	<li>
+		<a href="http://twitter.com/user/status/<%= tweet.tweet_id %>"><%= tweet.date.strftime "%d.%m.%Y %H:%M" %></a> - 
+		<strong><%= tweet.sender_name %></strong>
+		<%= tweet.message %><br />
+	</li>
+<% end %>
+</ol>

@@ -1,0 +1,5 @@
+<form method="POST" action="<%= url("/search") %>">
+	Text: <input type="text" name="containing" value="<%= params[:containing] %>" /><br />
+	Absender: <input type="text" name="sender" value="<%= params[:sender] %>" /><br />
+	<input type="submit" value="Suchen" />
+</form>
