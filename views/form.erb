@@ -1,5 +1,11 @@
 <form method="POST" action="<%= url("/search") %>">
 	Text: <input type="text" name="containing" value="<%= params[:containing] %>" /><br />
 	Absender: <input type="text" name="sender" value="<%= params[:sender] %>" /><br />
+    Mentions: <select name="mentions">
+        <option>Alles</option>
+        <option value="only">Nur Mentions</option>
+        <option value="none">Keine Mentions</option>
+    </select><br />
+
 	<input type="submit" value="Suchen" />
 </form>

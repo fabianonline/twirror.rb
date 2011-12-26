@@ -41,13 +41,13 @@ def do_update(config)
 
     puts "fertig."
 
-    if false
+    if true
         puts "Sent Tweets"
         page = 1
         response = []
         begin
             puts "Hole Page #{page}..."
-            temp = client.user_timeline({"count"=>200, "page"=>page})
+            temp = client.user_timeline({"count"=>200, "page"=>page}) rescue []
             response = response + temp
             page += 1
         end while temp.kind_of?(Array) && temp.length > 150

@@ -18,6 +18,15 @@ post '/search' do
 		condition_names << "sender_id = ?"
 		condition_values << id
 	end
+
+    if params[:mentions] == 'only'
+        condition_names << "LEFT(message, 1)='@'"
+    end
+
+    if params[:mentions] == 'none'
+        condition_names << "LEFT(message, 1)!='@'"
+    end
+
 	
 	@tweets = Tweet.find(:all, :conditions=>condition_values.unshift(condition_names.join(" AND ")), :order=>"date DESC")
 	erb :tweets
