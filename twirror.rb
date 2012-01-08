@@ -1,13 +1,16 @@
 #!/usr/bin/ruby
 
+# Require some nice libraries
 require 'rubygems'
 require 'active_record'
 require 'active_support'
 require 'getopt/long'
 require 'yaml'
 
+# Read the config from the config.yml YAML file
 config = YAML.load_file("#{File.dirname((File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__))}/config.yml")
 
+# Let ActiveRecord connect to the database using the credentials out of the config
 ActiveRecord::Base.establish_connection(
     :adapter => 'mysql',
     :host =>     config['mysql']['host'],
@@ -16,11 +19,13 @@ ActiveRecord::Base.establish_connection(
     :database => config['mysql']['database'],
     :encoding => config['mysql']['encoding'])
 
+# Define a tweet as an object with some allocation between the tweetdata and the fields of the database
 class Tweet < ActiveRecord::Base
-    validates_uniqueness_of :tweet_id, :scope=>:dm
-    def self.add(tweet)
-        return unless tweet
-        t = Tweet.new
+    validates_uniqueness_of :tweet_id, :scope=>:dm # First of all validate that the tweet is no duplicate
+    
+    def self.add(tweet) # Execute this method when adding a new tweet to the DB
+        return unless tweet # If the given argument is no real tweet, return and do nothing
+        t = Tweet.new # Otherwise, create a new tweet and fill it with content. Look below to see how.
         t.tweet_id = tweet["id"]
         t.sender_name = tweet["retweeted_status"]["user"]["screen_name"] rescue tweet["user"]["screen_name"]
         t.message = tweet["text"]
@@ -35,12 +40,12 @@ class Tweet < ActiveRecord::Base
         t.sender_friends = tweet["user"]["friends_count"] rescue nil
         t.sender_followers = tweet["user"]["followers_count"] rescue nil
         t.dm = 0
-        t.save
+        t.save # Save ALL the tweet
     end
 
-    def self.add_dm(tweet)
-        return unless tweet
-        t = Tweet.new
+    def self.add_dm(tweet) # Execute this method, when adding a new DM to the DB
+        return unless tweet # If the given argument is no real tweet, return and do nothing
+        t = Tweet.new # Otherwise, create a new tweet and fill it with content. Look below to see how.
         t.tweet_id = tweet["id"]
         t.sender_name = tweet["sender"]["screen_name"]
         t.message = tweet["text"]
@@ -50,19 +55,19 @@ class Tweet < ActiveRecord::Base
         t.dm = 1
         t.recipient_name = tweet["recipient"]["screen_name"]
         t.recipient_id = tweet["recipient_id"]
-        t.save
+        t.save # Save ALL the tweet
     end
 
-    def self.stats(period, username)
-        start = case period
+    def self.stats(period, username) # Execute this method for creating stats over the given period
+        start = case period # First, define the time range for the stats
             when :hourly then 1.days.ago
             when :daily then 30.days.ago
             when :weekly then 6.months.ago
             when :monthly then 2.years.ago
             else raise "Unknown period"
         end
-        tweets = Tweet.find(:all, :conditions=>{:date=>start..Time.now, :sender_name=>username})
-        result = tweets.inject(Hash.new(0)) do |memo, tweet|
+        tweets = Tweet.find(:all, :conditions=>{:date=>start..Time.now, :sender_name=>username}) # Find all the tweets in the range by username
+        result = tweets.inject(Hash.new(0)) do |memo, tweet| # Do some funny stuff to create the stats. Ask fabianonline for more info ;)
             diff = case period
                 when :daily then 0
                 when :weekly then (tweet.date.to_date.wday-1)%7
@@ -84,19 +89,19 @@ class Tweet < ActiveRecord::Base
         end
     end
 
-    def self.info
+    def self.info # Execute this method for getting some info about the tweets in the DB
         puts "Tweets in DB: #{Tweet.count}"
         puts "Neuester Tweet: #{Tweet.last.date} (vor #{(Time.now - Tweet.last.date) / 60} Minuten)"
     end
 
-    def self.get_user_id(username)
+    def self.get_user_id(username) # Execute this method for getting the user id for a given username
         result = Tweet.find_all_by_sender_name(username, :group=>:sender_id)
-        raise "Ambiguous Username... Houston, we have a problem!" if result.count > 1
-        raise "User not found" if result.empty?
+        raise "Ambiguous Username... Houston, we have a problem!" if result.count > 1 # Raises exception if username is not unique
+        raise "User not found" if result.empty? # Raises exception if username is not found
         result.first.sender_id
     end
 
-    def self.nelsontweets
+    def self.nelsontweets # Find ALL the Nelsontweets (tweets containing "Ha, Ha", like Nelson Muntz from The Simpsons does)
         ende = Date.today-Date.today.wday
         start = ende-7
         tweets = Tweet.find(:all, :conditions=>["date >= :start AND date <= :ende AND message LIKE '%#nelsontweet%'", {:start=>start, :ende=>ende}])
@@ -109,7 +114,9 @@ class Tweet < ActiveRecord::Base
     end
 end
 
-include Getopt
+include Getopt # Include yet another library...or so.
+
+# @fabianonline Srsly, was hast du da wieder für Kram zusammengeschrieben? I understand only train station.
 
 opt = Getopt::Long.getopts(
     ['--update', '-u', BOOLEAN],
