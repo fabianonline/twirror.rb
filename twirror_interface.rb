@@ -26,8 +26,14 @@ post '/search' do
     if params[:mentions] == 'none'
         condition_names << "LEFT(message, 1)!='@'"
     end
+    
+    if params[:order] == 'asc'
+        order = "date"
+    else
+        order = "date DESC"
+    end
 
 	
-	@tweets = Tweet.find(:all, :conditions=>condition_values.unshift(condition_names.join(" AND ")), :order=>"date DESC")
+	@tweets = Tweet.find(:all, :conditions=>condition_values.unshift(condition_names.join(" AND ")), :order=>order)
 	erb :tweets
 end
