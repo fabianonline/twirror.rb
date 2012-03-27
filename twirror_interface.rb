@@ -1,6 +1,12 @@
 require './twirror'
 
 get '/' do
+	erb :index
+end
+
+get '/stats' do
+	@sender = 'fabianonline'
+	@stats = Tweet.stats(:daily, @sender)
 	erb :stats
 end
 

@@ -54,35 +54,30 @@ class Tweet < ActiveRecord::Base
     end
 
     def self.stats(period, username)
-        start = case period
-            when :hourly then 1.days.ago
-            when :daily then 30.days.ago
-            when :weekly then 6.months.ago
-            when :monthly then 2.years.ago
-            else raise "Unknown period"
-        end
-        tweets = Tweet.find(:all, :conditions=>{:date=>start..Time.now, :sender_name=>username})
-        result = tweets.inject(Hash.new(0)) do |memo, tweet|
-            diff = case period
+		memo = Hash.new(0)
+        Tweet.find_each(:conditions=>{:sender_name=>username}) do |tweet|
+			diff = case period
                 when :daily then 0
                 when :weekly then (tweet.date.to_date.wday-1)%7
                 when :monthly then (tweet.date.to_date.mday-1)
             end
             memo[tweet.date.to_date-diff]+=1
-            memo
-        end.sort
-        max = result.inject(0){|memo, day| (day[1]>memo ? day[1] : memo)}
-        width = 150.0
-        faktor = width / max
-        
-        result.each do |day|
-            color = case day[0].wday
-                when 0 then "\e[31m"
-                else "\e[0m"
-            end
-            puts "%s%s\e[0m: (%4d) [%-150s]" % [color, day[0].to_s, day[1], '#'*(day[1]*faktor)]
         end
+		memo.sort
     end
+
+	def self.print_stats(period, username)
+		result = self.stats(period, username).last(30)
+		max = result.inject(0){|memo, day| (day[1]>memo ? day[1] : memo)}
+		faktor = 150.0 / max
+		result.each do |day|
+			color = case day[0].wday
+				when 0 then "\e[31m"
+				else "\e[0m"
+			end
+			puts "%s%s\e[0m: (%4d) [%-150s]" % [color, day[0].to_s, day[1], '#'*(day[1]*faktor)]
+		end
+	end
 
     def self.info
         puts "Tweets in DB: #{Tweet.count}"
@@ -158,13 +153,13 @@ unless conditions.empty?
 end
 
 if opt["hourly"]
-    Tweet.stats(:hourly, config['twitter']['username'])
+    Tweet.print_stats(:hourly, config['twitter']['username'])
 elsif opt["daily"]
-    Tweet.stats(:daily, config['twitter']['username'])
+    Tweet.print_stats(:daily, config['twitter']['username'])
 elsif opt["weekly"]
-    Tweet.stats(:weekly, config['twitter']['username'])
+    Tweet.print_stats(:weekly, config['twitter']['username'])
 elsif opt["monthly"]
-    Tweet.stats(:monthly, config['twitter']['username'])
+    Tweet.print_stats(:monthly, config['twitter']['username'])
 elsif opt["help"]
     puts "help"
 elsif opt["info"]
