@@ -53,18 +53,18 @@ class Tweet < ActiveRecord::Base
         t.save
     end
 
-    def self.stats(period, username)
-		memo = Hash.new(0)
-        Tweet.find_each(:conditions=>{:sender_name=>username}) do |tweet|
-			diff = case period
-                when :daily then 0
-                when :weekly then (tweet.date.to_date.wday-1)%7
-                when :monthly then (tweet.date.to_date.mday-1)
-            end
-            memo[tweet.date.to_date-diff]+=1
-        end
-		memo.sort
-    end
+	def self.stats(period, username)
+		group = case period
+			when :daily then "DATE(date)"
+			when :weekly then "SUBDATE(DATE(date), WEEKDAY(date))"
+			when :monthly then "SUBDATE(DATE(date), DAYOFMONTH(date)-1)"
+		end
+		hash = {}
+		Tweet.find(:all, :conditions=>{:sender_name=>username}, :select=>"id, DATE(date) AS date, COUNT(id) AS count_value", :group=>group).each do |entry|
+			hash[entry.date.to_date] = entry.count_value
+		end
+		hash.sort
+	end
 
 	def self.print_stats(period, username)
 		result = self.stats(period, username).last(30)
