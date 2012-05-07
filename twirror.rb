@@ -2,10 +2,8 @@
 
 # Require some nice libraries
 require 'rubygems'
-require 'active_record'
-require 'active_support'
-require 'getopt/long'
-require 'yaml'
+require 'bundler'
+Bundler.require
 require 'tweet.rb'
 
 include Getopt # Include Getopt. It's a library to automatically parse command line parameters
