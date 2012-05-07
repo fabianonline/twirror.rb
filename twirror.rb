@@ -7,6 +7,9 @@ require 'active_support'
 require 'getopt/long'
 require 'yaml'
 
+# Extend the Namespace for the Getopt Gem
+include Getopt
+
 # Read the config from the config.yml YAML file
 config = YAML.load_file("#{File.dirname((File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__))}/config.yml")
 
@@ -113,8 +116,6 @@ class Tweet < ActiveRecord::Base
         puts message
     end
 end
-
-include Getopt # Include yet another library...or so.
 
 # @fabianonline Srsly, was hast du da wieder für Kram zusammengeschrieben? I understand only train station.
 
