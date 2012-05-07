@@ -32,40 +32,50 @@ def get_tweets(client, settings={})
 end
 
 def do_update(config)
-    client = TwitterOAuth::Client.new(
-        :consumer_key =>    config['twitter']['consumer']['token'],
-        :consumer_secret => config['twitter']['consumer']['secret'],
-        :token =>           config['twitter']['user']['token'],
-        :secret =>          config['twitter']['user']['secret'])
-
-    unless client.authorized?
-        puts "Konnte nicht mit Twitter authorisieren..."
-        Process.exit
-    end
-
-	all_objects = []
-
-    start = Tweet.maximum('tweet_id', :conditions=>'dm = 0') || 1
-
-	all_objects += get_tweets(client, :start=>start, :description=>"Timeline", :twitter_method=>:home_timeline, :tweet_add_method=>:add)
-	all_objects += get_tweets(client, :start=>start, :description=>"Mentions", :twitter_method=>:mentions, :tweet_add_method=>:add)
-	all_objects += get_tweets(client, :start=>start, :description=>"Sent Tweets", :twitter_method=>:user_timeline, :tweet_add_method=>:add)
-
-    start = Tweet.maximum('tweet_id', :conditions=>'dm = 1') || 1
-
-	all_objects += get_tweets(client, :start=>start, :description=>"Received DMs", :twitter_method=>:messages, :tweet_add_method=>:add_dm)
-	all_objects += get_tweets(client, :start=>start, :description=>"Sent DMs", :twitter_method=>:sent_messages, :tweet_add_method=>:add_dm)
-
-
-	counter = 0
-	print "Saving data to DB:".ljust(25)
-	all_objects.sort_by{|obj| obj.date}.each do |obj|
-		if obj.save
-			counter += 1
-			print "."
-		else
-			print "#"
-		end
+	accounts = []
+	if config['twitter'].is_a?(Array)
+		accounts = config['twitter']
+	else
+		accounts = [config['twitter']]
 	end
-	puts "  (#{counter}/#{all_objects.count})"
+
+	accounts.each do |acct|
+		puts "** #{acct['username']} **" if acct['username']
+		client = TwitterOAuth::Client.new(
+			:consumer_key =>    acct['consumer']['token'],
+			:consumer_secret => acct['consumer']['secret'],
+			:token =>           acct['user']['token'],
+			:secret =>          acct['user']['secret'])
+
+		unless client.authorized?
+			puts "Konnte nicht mit Twitter authorisieren..."
+			next
+		end
+
+		all_objects = []
+
+		start = Tweet.maximum('tweet_id', :conditions=>'dm = 0') || 1
+
+		all_objects += get_tweets(client, :start=>start, :description=>"Timeline", :twitter_method=>:home_timeline, :tweet_add_method=>:add)
+		all_objects += get_tweets(client, :start=>start, :description=>"Mentions", :twitter_method=>:mentions, :tweet_add_method=>:add)
+		all_objects += get_tweets(client, :start=>start, :description=>"Sent Tweets", :twitter_method=>:user_timeline, :tweet_add_method=>:add)
+
+		start = Tweet.maximum('tweet_id', :conditions=>'dm = 1') || 1
+
+		all_objects += get_tweets(client, :start=>start, :description=>"Received DMs", :twitter_method=>:messages, :tweet_add_method=>:add_dm)
+		all_objects += get_tweets(client, :start=>start, :description=>"Sent DMs", :twitter_method=>:sent_messages, :tweet_add_method=>:add_dm)
+
+
+		counter = 0
+		print "Saving data to DB:".ljust(25)
+		all_objects.sort_by{|obj| obj.date}.each do |obj|
+			if obj.save
+				counter += 1
+				print "."
+			else
+				print "#"
+			end
+		end
+		puts "  (#{counter}/#{all_objects.count})"
+	end
 end
