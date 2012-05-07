@@ -35,7 +35,7 @@ class Tweet < ActiveRecord::Base
         t.sender_friends = tweet["user"]["friends_count"] rescue nil
         t.sender_followers = tweet["user"]["followers_count"] rescue nil
         t.dm = 0
-        t.save
+		t
     end
 
     def self.add_dm(tweet)
@@ -50,7 +50,7 @@ class Tweet < ActiveRecord::Base
         t.dm = 1
         t.recipient_name = tweet["recipient"]["screen_name"]
         t.recipient_id = tweet["recipient_id"]
-        t.save
+		t
     end
 
 	def self.stats(period, username)

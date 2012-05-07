@@ -13,92 +13,146 @@ def do_update(config)
         Process.exit
     end
 
+	objects = []
+
 
     start = Tweet.maximum('tweet_id', :conditions=>'dm = 0') || 1
 
-    #puts "Tweets (home_timeline)"
-    #puts "======================"
-    #puts "since_id: #{start}"
-
-    print "home_timeline... "
-
-    page = 1
-    response = []
-
+    print "Timeline:             "
+	parameters = {"count"=>"200", "since_id"=>start}
+	min_id = nil
+	counter = 0
     begin
-        #puts "Hole Page #{page}..."
-        temp = client.home_timeline({"count"=>"200", "since_id"=>start, "page"=>page})
-        response = response + temp
-        page += 1
-    end while temp.kind_of?(Array) && temp.length > 150
+        temp = client.home_timeline(parameters)
+		print '#'
+		if temp.kind_of?(Array)
+			temp.each do |t|
+				tweet = Tweet.add(t)
+				print "."
+				counter+=1
+				if min_id==nil || min_id>tweet.tweet_id
+					min_id = tweet.tweet_id
+				end
+				objects << tweet
+			end
+		else
+			raise "Got error. Aborting."
+		end
+		parameters["max_id"] = min_id-1 rescue nil
+    end while temp.kind_of?(Array) && temp.length > 0 && min_id!=nil
+	puts " (#{counter})"
 
-    #puts "Anzahl Tweets: #{response.length}"
-    print "#{response.length}... "
 
-    response.reverse.each do |r|
-        Tweet.add(r)
-    end
+    print "Mentions:             "
+	parameters = {"count"=>"200", "since_id"=>start}
+	min_id = nil
+	counter = 0
+    begin
+        temp = client.mentions(parameters)
+		print '#'
+		if temp.kind_of?(Array)
+			temp.each do |t|
+				tweet = Tweet.add(t)
+				print "."
+				counter+=1
+				if min_id==nil || min_id>tweet.tweet_id
+					min_id = tweet.tweet_id
+				end
+				objects << tweet
+			end
+		else
+			raise "Got error. Aborting."
+		end
+		parameters["max_id"] = min_id-1 rescue nil
+    end while temp.kind_of?(Array) && temp.length > 0 && min_id!=nil
+	puts " (#{counter})"
 
-    puts "fertig."
 
-    if true
-        puts "Sent Tweets"
-        page = 1
-        response = []
-        begin
-            puts "Hole Page #{page}..."
-            temp = client.user_timeline({"count"=>200, "page"=>page}) rescue []
-            response = response + temp
-            page += 1
-        end while temp.kind_of?(Array) && temp.length > 150
-        puts "Anzahl Tweets: #{response.length}"
-        response.reverse.each do |r|
-            Tweet.add(r)
-            print '.'
-        end
-        puts ""
-        puts ""
-    end
+    print "Sent Tweets:          "
+	parameters = {"count"=>"200", "since_id"=>start}
+	min_id = nil
+	counter = 0
+	begin
+		temp = client.user_timeline(parameters)
+		print '#'
+		if temp.kind_of?(Array)
+			temp.each do |t|
+				tweet = Tweet.add(t)
+				print "."
+				counter+=1
+				if min_id==nil || min_id>tweet.tweet_id
+					min_id = tweet.tweet_id
+				end
+				objects << tweet
+			end
+		else
+			raise "Got error. Aborting."
+		end
+		parameters["max_id"] = min_id-1 rescue nil
+	end while temp.kind_of?(Array) && temp.length > 0 && min_id!=nil
+	puts " (#{counter})"
+
+
 
     start = Tweet.maximum('tweet_id', :conditions=>'dm = 1') || 1
 
-    print "direct_messages... "
-    #puts "Direct Messages"
-    #puts "==============="
-    #puts "since_id: #{start}"
-
-    page = 1
-    response = []
-
-    #puts "Hole empfangene DMs..."
-    print "received... "
+    print "Received DMs:         "
+	parameters = {"count"=>"200", "since_id"=>start}
+	min_id = nil
+	counter = 0
     begin
-        #puts "Page #{page}..."
-        temp = client.messages({"count"=>"200", "since_id"=>start, "page"=>page})
-        response = response + temp
-        page += 1
-    end while temp.kind_of?(Array) && temp.length > 150
+        temp = client.messages(parameters)
+		print '#'
+		if temp.kind_of?(Array)
+			temp.each do |t|
+				tweet = Tweet.add_dm(t)
+				print "."
+				counter+=1
+				if min_id==nil || min_id>tweet.tweet_id
+					min_id = tweet.tweet_id
+				end
+				objects << tweet
+			end
+		else
+			raise "Got error. Aborting."
+		end
+		parameters["max_id"] = min_id-1 rescue nil
+    end while temp.kind_of?(Array) && temp.length > 0 && min_id!=nil
+	puts " (#{counter})"
 
-
-
-    #puts "Hole gesendete DMs..."
-    print "sent... "
-    page = 1
+    print "Sent DMs:             "
+	parameters = {"count"=>"200", "since_id"=>start}
+	min_id = nil
+	counter = 0
     begin
-        #puts "Page #{page}..."
-        temp = client.sent_messages({"count"=>200, "since_id"=>start, "page"=>page})
-        response = response + temp
-        page += 1
-    end while temp.kind_of?(Array) && temp.length > 150
+        temp = client.sent_messages(parameters)
+		print '#'
+		if temp.kind_of?(Array)
+			temp.each do |t|
+				tweet = Tweet.add_dm(t)
+				print "."
+				counter+=1
+				if min_id==nil || min_id>tweet.tweet_id
+					min_id = tweet.tweet_id
+				end
+				objects << tweet
+			end
+		else
+			raise "Got error. Aborting."
+		end
+		parameters["max_id"] = min_id-1 rescue nil
+	end while temp.kind_of?(Array) && temp.length > 0 && min_id!=nil
+	puts " (#{counter})"
 
-    print "#{response.length}... "
-    #puts "Anzahl DMs: #{response.length}"
-
-    response.reverse.each do |r|
-        Tweet.add_dm(r)
-        #print "."
-    end
-
-    puts "fertig."
-    puts ""
+	counter = 0
+	print "Saving data to DB:    "
+	objects.sort_by{|obj| obj.date}.each do |obj|
+		if obj.save
+			counter += 1
+			print "."
+		else
+			print "#"
+		end
+	end
+	puts "  (#{counter}/#{objects.count})"
 end
