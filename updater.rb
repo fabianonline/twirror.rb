@@ -1,9 +1,12 @@
 require 'twitter_oauth'
 $stdout.sync = true
 
+# Get the tweets from a certain source (Timeline, Mentions, DMs)
 def get_tweets(client, settings={})
+  # Rescue missing parameters
 	raise "Missing parameters!" unless [:start, :description, :twitter_method, :tweet_add_method].all?{|e| settings.has_key?(e)}
 
+  
 	print "#{settings[:description].ljust(25)}: "
 	parameters = {"count"=>"200", "since_id"=>settings[:start]}
 	min_id = nil
