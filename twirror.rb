@@ -23,11 +23,7 @@ ActiveRecord::Base.establish_connection(
     :encoding => config['mysql']['encoding'])
 
 
-
-
-
-
-
+# Get the options from the command line
 opt = Getopt::Long.getopts(
     ['--update', '-u', BOOLEAN],
     ['--info', '-i', BOOLEAN],
@@ -35,15 +31,20 @@ opt = Getopt::Long.getopts(
 ) rescue {}
 
 
+# Call the tweet update process
 if opt["update"]
     require "#{File.dirname((File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__))}/updater.rb"
     do_update(config)
+    
+# Call a nagios compatible output for watching the script
 elsif opt["nagios"]
     diff = Time.now - Tweet.last.date # in Sekunden
     puts "Neuester Tweet ist #{(diff / 60).round} Minuten alt."
     exit 2 if diff > (24*60*60) # 24 Stunden - CRITICAL
     exit 1 if diff > (12*60*60) # 12 Stunden - WARNING
     exit 0 # Alles OK
+    
+# Call the Info (of whatever, has to be checked)
 elsif opt["info"]
     Tweet.info
 end
