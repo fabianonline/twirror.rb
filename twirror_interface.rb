@@ -39,7 +39,9 @@ post '/search' do
         order = "date DESC"
     end
 
+	limit = params[:limit] || 500
+
 	
-	@tweets = Tweet.find(:all, :conditions=>condition_values.unshift(condition_names.join(" AND ")), :order=>order)
+	@tweets = Tweet.find(:all, :conditions=>condition_values.unshift(condition_names.join(" AND ")), :order=>order, :limit=>limit)
 	erb :tweets
 end
