@@ -1,7 +1,13 @@
 # This file here creates some nice HTTP action for viewing the contents of the twirror DB
 require './twirror'
 
-get '/' do # If root is called, show the stats erb view
+get '/' do
+	erb :index
+end
+
+get '/stats' do
+	@sender = 'fabianonline'
+	@stats = Tweet.stats(:daily, @sender)
 	erb :stats
 end
 
@@ -27,8 +33,16 @@ post '/search' do # If a search is requested, do the search stuff.
     if params[:mentions] == 'none' # Fill the search condition to search in any tweets but mentions
         condition_names << "LEFT(message, 1)!='@'"
     end
+    
+    if params[:order] == 'asc'
+        order = "date"
+    else
+        order = "date DESC"
+    end
+
+	limit = params[:limit] || 500
 
 	
-	@tweets = Tweet.find(:all, :conditions=>condition_values.unshift(condition_names.join(" AND ")), :order=>"date DESC") # Search action in 3..2..1..EXECUTE
-	erb :tweets # Show the tweets erb view to reveal the search results.
+	@tweets = Tweet.find(:all, :conditions=>condition_values.unshift(condition_names.join(" AND ")), :order=>order, :limit=>limit)
+	erb :tweets
 end

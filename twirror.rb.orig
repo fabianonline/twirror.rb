@@ -88,10 +88,14 @@ class Tweet < ActiveRecord::Base
     end
 end
 
+<<<<<<< HEAD
+# @fabianonline Srsly, was hast du da wieder für Kram zusammengeschrieben? I understand only train station.
+=======
 
 
 
 include Getopt # Include Getopt. It's a library to automatically parse command line parameters
+>>>>>>> 311c5f78521ded2598e4aad9dcf799269f27e339
 
 opt = Getopt::Long.getopts(
     ['--update', '-u', BOOLEAN],
