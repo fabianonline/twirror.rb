@@ -6,7 +6,7 @@ require 'active_record'
 require 'active_support'
 require 'getopt/long'
 require 'yaml'
-require 'twitter.rb'
+require 'tweet.rb'
 
 include Getopt # Include Getopt. It's a library to automatically parse command line parameters
 
