@@ -1,27 +1,3 @@
-#!/usr/bin/ruby
-
-# Require some nice libraries
-require 'rubygems'
-require 'active_record'
-require 'active_support'
-require 'getopt/long'
-require 'yaml'
-
-# Extend the Namespace for the Getopt Gem
-include Getopt
-
-# Read the config from the config.yml YAML file
-config = YAML.load_file("#{File.dirname((File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__))}/config.yml")
-
-# Let ActiveRecord connect to the database using the credentials out of the config
-ActiveRecord::Base.establish_connection(
-    :adapter => 'mysql',
-    :host =>     config['mysql']['host'],
-    :username => config['mysql']['username'],
-    :password => config['mysql']['password'],
-    :database => config['mysql']['database'],
-    :encoding => config['mysql']['encoding'])
-
 # Define a tweet as an object with some allocation between the tweetdata and the fields of the database
 class Tweet < ActiveRecord::Base
     validates_uniqueness_of :tweet_id, :scope=>:dm # First of all validate that the tweet is no duplicate
@@ -87,33 +63,3 @@ class Tweet < ActiveRecord::Base
         result.first.sender_id
     end
 end
-
-<<<<<<< HEAD
-# @fabianonline Srsly, was hast du da wieder für Kram zusammengeschrieben? I understand only train station.
-=======
-
-
-
-include Getopt # Include Getopt. It's a library to automatically parse command line parameters
->>>>>>> 311c5f78521ded2598e4aad9dcf799269f27e339
-
-opt = Getopt::Long.getopts(
-    ['--update', '-u', BOOLEAN],
-    ['--info', '-i', BOOLEAN],
-    ['--nagios', BOOLEAN]
-) rescue {}
-
-
-if opt["update"]
-    require "#{File.dirname((File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__))}/updater.rb"
-    do_update(config)
-elsif opt["nagios"]
-    diff = Time.now - Tweet.last.date # in Sekunden
-    puts "Neuester Tweet ist #{(diff / 60).round} Minuten alt."
-    exit 2 if diff > (24*60*60) # 24 Stunden - CRITICAL
-    exit 1 if diff > (12*60*60) # 12 Stunden - WARNING
-    exit 0 # Alles OK
-elsif opt["info"]
-    Tweet.info
-end
-
