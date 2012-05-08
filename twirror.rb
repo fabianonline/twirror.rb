@@ -1,10 +1,9 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 # Require some nice libraries
 require 'rubygems'
-require 'active_record'
-require 'active_support'
-require 'getopt/long'
+require 'bundler'
+Bundler.require
 require 'yaml'
 require 'tweet.rb'
 
