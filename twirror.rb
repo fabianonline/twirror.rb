@@ -1,8 +1,7 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 # Require some nice libraries
 require 'rubygems'
-require 'rubygems/version'
 require 'bundler'
 Bundler.require
 require 'yaml'
