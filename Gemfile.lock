@@ -1,0 +1,37 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    active_support (3.0.0)
+      activesupport (= 3.0.0)
+    activemodel (3.0.0)
+      activesupport (= 3.0.0)
+      builder (~> 2.1.2)
+      i18n (~> 0.4.1)
+    activerecord (3.0.0)
+      activemodel (= 3.0.0)
+      activesupport (= 3.0.0)
+      arel (~> 1.0.0)
+      tzinfo (~> 0.3.23)
+    activesupport (3.0.0)
+    arel (1.0.1)
+      activesupport (~> 3.0.0)
+    builder (2.1.2)
+    getopt (1.4.1)
+    i18n (0.4.2)
+    json (1.7.1)
+    mime-types (1.18)
+    oauth (0.4.6)
+    twitter_oauth (0.4.3)
+      json (>= 1.1.9)
+      mime-types (>= 1.16)
+      oauth (>= 0.4.1)
+    tzinfo (0.3.33)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  active_support
+  activerecord
+  getopt
+  twitter_oauth

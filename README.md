@@ -5,7 +5,7 @@ Ein Tweet-Archivierungstool, basierend auf Ruby und dem Sinatra-Framework.
 
 Anders als andere Archivierungstools setzt Twirror den Fokus darauf, alle Tweets, die ein User sehen konnte, zu sichern. Es werden also nicht nur eines Users Tweets gesichert, sondern auch die Tweets, die er in seiner 
 Teimline zu sehen bekam (Tweets von Freunden und so).
-Dafür meldet sich Twirror als neuer Client mit den Daten des zu archivierenden Accounts an, und liest "einfach" dessen Timeline aus.
+Dafür meldet sich Twirror als neuer Client mit den Daten des zu archivierenden Accounts an, und liest "einfach" dessen Timeline aus.w
 
 Installation
 ------------
