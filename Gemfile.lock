@@ -18,8 +18,9 @@ GEM
     builder (2.1.2)
     getopt (1.4.1)
     i18n (0.4.2)
-    json (1.7.1)
+    json (1.7.0)
     mime-types (1.18)
+    mysql (2.8.1)
     oauth (0.4.6)
     twitter_oauth (0.4.3)
       json (>= 1.1.9)
@@ -34,4 +35,5 @@ DEPENDENCIES
   active_support
   activerecord
   getopt
+  mysql
   twitter_oauth

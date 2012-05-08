@@ -1,9 +1,10 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 # Require some nice libraries
 require 'rubygems'
 require 'bundler'
 Bundler.require
+require 'yaml'
 require 'tweet.rb'
 
 include Getopt # Include Getopt. It's a library to automatically parse command line parameters
