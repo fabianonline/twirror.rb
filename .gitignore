@@ -2,3 +2,4 @@ config.yml
 ._*
 bitmap.png
 *.orig
+tn_tweets.xml

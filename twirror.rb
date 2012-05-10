@@ -5,7 +5,7 @@ require 'rubygems'
 require 'bundler'
 Bundler.require
 require 'yaml'
-require 'tweet.rb'
+require './tweet.rb'
 
 include Getopt # Include Getopt. It's a library to automatically parse command line parameters
 

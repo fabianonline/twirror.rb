@@ -21,6 +21,7 @@ GEM
     json (1.7.0)
     mime-types (1.18)
     mysql (2.8.1)
+    nokogiri (1.5.2)
     oauth (0.4.6)
     twitter_oauth (0.4.3)
       json (>= 1.1.9)
@@ -36,4 +37,5 @@ DEPENDENCIES
   activerecord
   getopt
   mysql
+  nokogiri
   twitter_oauth
