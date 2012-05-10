@@ -2,7 +2,7 @@
 ## Place tweetnest tweet xml from phpmyadmin in this folder
 require 'rubygems'
 require 'nokogiri'
-require File.expand_path('../')
+require '../twirror.rb'
 
 XML_FILE = 'tn_tweets.xml'
 
