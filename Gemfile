@@ -6,3 +6,5 @@ gem "getopt", :require => "getopt/long"
 gem "twitter_oauth"
 gem "mysql"
 gem "nokogiri"
+gem "php-serialize"
+

@@ -23,6 +23,7 @@ GEM
     mysql (2.8.1)
     nokogiri (1.5.2)
     oauth (0.4.6)
+    php-serialize (1.1.0)
     twitter_oauth (0.4.3)
       json (>= 1.1.9)
       mime-types (>= 1.16)
@@ -38,4 +39,5 @@ DEPENDENCIES
   getopt
   mysql
   nokogiri
+  php-serialize
   twitter_oauth
